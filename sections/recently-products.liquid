@@ -1,0 +1,212 @@
+{{ 'section-recently-viewed.css' | asset_url | stylesheet_tag }}
+
+<h2 class="recently-viewed-heading">{{section.settings.heading}}</h2>
+<div class="recently-viewed-wrapper page-width">
+  <div id="featured-container">
+    
+    <div class="recently-viewed-products">
+    <!-- Recently viewed products will appear here -->
+    </div>
+  </div>
+</div>
+
+<script>
+function setRecentlyViewedProducts() {
+  const productData = {
+    productTitle: "{{ product.title }}",
+    productImg: "{{ product.featured_media | img_url: '300x' }}",
+    productPrice: "{{ product.price | money }}",
+    productUrl: "{{ product.url }}",
+    productImageAltText: "{{product.featured_media.alt | escape }}",
+    productVendor: "{{ product.vendor }}",
+    productId:"{{ product.variants.first.id }}",
+    productCount: "{{ product.metafields.junip.rating_count }}",
+    productRating:"{{ product.metafields.junip.rating_average }}"
+  };
+  const productList = [];
+  let jsonResp, jsonRespArr, jsonRespArrStr;
+  const numberOfProducts = 8;
+  productList.push(productData);
+  const currProductPageTitle = productData.productTitle;
+  const productDataString = JSON.stringify(productList);
+  const localData = localStorage.getItem("recentlyViewedProduct");
+
+  if (localData === null) {
+    localStorage.setItem("recentlyViewedProduct", productDataString);
+  } else if (localData) {
+    const oldProductData = localStorage.getItem("recentlyViewedProduct");
+    const countProductData = (oldProductData.match(/productTitle/g) || []).length;
+    const sameProduct = oldProductData.includes(currProductPageTitle);
+    if (countProductData < numberOfProducts && sameProduct == false) {
+      jsonResp = JSON.parse(oldProductData);
+      jsonRespArr = jsonResp.concat(productList);
+      jsonRespArrStr = JSON.stringify(jsonRespArr);
+      localStorage.setItem("recentlyViewedProduct", jsonRespArrStr);
+    } else if (countProductData >= numberOfProducts && sameProduct == false) {
+      jsonResp = JSON.parse(oldProductData);
+      jsonResp.shift();
+      jsonRespArr = jsonResp.concat(productList);
+      jsonRespArr = JSON.stringify(jsonRespArr);
+      localStorage.setItem("recentlyViewedProduct", jsonRespArr);
+    }
+  }
+}
+
+setRecentlyViewedProducts();
+const localViewed = localStorage.recentlyViewedProduct;
+function getRecentlyViewedProducts() {
+  const productData = JSON.parse(localStorage.getItem("recentlyViewedProduct"));
+  const recentlyViewedHtml = [];
+  console.log(productData);
+  productData.slice(-5, -1).map(item => {
+    const enabled = true;
+    const starColor = 'black';
+    const showCount = true;
+    const cardTop = `<div id="recently-product-card-container">
+      <div id="recently-product-card-top">
+        <a id="recently-product-card-link" href="${item.productUrl}" > 
+          <img loading="lazy" alt="${item.productImageAltText}" src="${item.productImg}">
+          <div id="recently-product-card-vendor">${item.productVendor}</div>
+          <div id="recently-product-card-title">${item.productTitle }</div> 
+        </a>
+      </div>
+      <div id="recently-product-card-bottom">`
+
+    const cardReview = `<span
+          class="junip-product-summary"
+          data-product-id="${item.productId}"
+          data-product-rating-count="${item.productCount}"
+          data-product-rating-average="${item.productRating}"> 
+          
+              <div class="junip-product-summary-stars-wrapper" style="--junipStarColor: ${item.productRating}; text-align: inherit;">
+                <div class="junip-product-summary-star-ratings-container" aria-label="${item.productRating} stars, ${item.productCount} reviews" style="display: inline-flex; margin-left: -1px; align-items: center;">
+                  <div class="junip-stars-container" style="display: flex; align-items: center; position: relative;">
+                    <div class="junip-stars-outline" style="display: flex; align-items: center;">
+                      
+                        <div class="junip-product-summary-star junip-star-outline" style="height: 20px; width: 20px; padding: 2px; z-index: inherit;">
+                          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" role="img" style="display: block; margin: auto; width: auto; height: auto;">
+                            <title>Outline star</title>
+                            <path d="m3.2 16.0001081c-.1687782 0-.33328968-.0531313-.47-.1521081-.24051968-.174488-.36451194-.4679107-.322-.762l.743-5.203-2.917-2.917c-.21191095-.21196521-.28756133-.52460199-.196-.81.09130759-.2851682.3345701-.49522345.63-.544l4.398-.734 2.218-4.435c.13744692-.27145241.41573373-.4426761.72-.443.3045618.00166772.58175678.1761261.715.45l2.123 4.362 4.498.801c.2933158.05211246.5333796.26289081.623.547.0898959.28455453.0135125.59548872-.198.806l-2.917 2.917.744 5.203c.042199.2957461-.0839008.5903645-.327.764-.2421349.1739598-.5609835.1986349-.827.064l-4.382-2.22-4.502 2.223c-.10996656.0547452-.23116004.0831081-.354.0831081zm1.51-2.8841081 3.357-1.658.892.452 2.327 1.178-.56-3.912.708-.707 1.29-1.29-3.234-.576-.446-.915-1.06-2.176-1.584 3.171-1.005.168-2.098.35 1.975 1.975-.141.99z" fill="var(--junipStarColor)"/>
+                          </svg>
+                        </div>
+                        <div class="junip-product-summary-star junip-star-outline" style="height: 20px; width: 20px; padding: 2px; z-index: inherit;">
+                          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" role="img" style="display: block; margin: auto; width: auto; height: auto;">
+                            <title>Outline star</title>
+                            <path d="m3.2 16.0001081c-.1687782 0-.33328968-.0531313-.47-.1521081-.24051968-.174488-.36451194-.4679107-.322-.762l.743-5.203-2.917-2.917c-.21191095-.21196521-.28756133-.52460199-.196-.81.09130759-.2851682.3345701-.49522345.63-.544l4.398-.734 2.218-4.435c.13744692-.27145241.41573373-.4426761.72-.443.3045618.00166772.58175678.1761261.715.45l2.123 4.362 4.498.801c.2933158.05211246.5333796.26289081.623.547.0898959.28455453.0135125.59548872-.198.806l-2.917 2.917.744 5.203c.042199.2957461-.0839008.5903645-.327.764-.2421349.1739598-.5609835.1986349-.827.064l-4.382-2.22-4.502 2.223c-.10996656.0547452-.23116004.0831081-.354.0831081zm1.51-2.8841081 3.357-1.658.892.452 2.327 1.178-.56-3.912.708-.707 1.29-1.29-3.234-.576-.446-.915-1.06-2.176-1.584 3.171-1.005.168-2.098.35 1.975 1.975-.141.99z" fill="var(--junipStarColor)"/>
+                          </svg>
+                        </div>
+                        <div class="junip-product-summary-star junip-star-outline" style="height: 20px; width: 20px; padding: 2px; z-index: inherit;">
+                          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" role="img" style="display: block; margin: auto; width: auto; height: auto;">
+                            <title>Outline star</title>
+                            <path d="m3.2 16.0001081c-.1687782 0-.33328968-.0531313-.47-.1521081-.24051968-.174488-.36451194-.4679107-.322-.762l.743-5.203-2.917-2.917c-.21191095-.21196521-.28756133-.52460199-.196-.81.09130759-.2851682.3345701-.49522345.63-.544l4.398-.734 2.218-4.435c.13744692-.27145241.41573373-.4426761.72-.443.3045618.00166772.58175678.1761261.715.45l2.123 4.362 4.498.801c.2933158.05211246.5333796.26289081.623.547.0898959.28455453.0135125.59548872-.198.806l-2.917 2.917.744 5.203c.042199.2957461-.0839008.5903645-.327.764-.2421349.1739598-.5609835.1986349-.827.064l-4.382-2.22-4.502 2.223c-.10996656.0547452-.23116004.0831081-.354.0831081zm1.51-2.8841081 3.357-1.658.892.452 2.327 1.178-.56-3.912.708-.707 1.29-1.29-3.234-.576-.446-.915-1.06-2.176-1.584 3.171-1.005.168-2.098.35 1.975 1.975-.141.99z" fill="var(--junipStarColor)"/>
+                          </svg>
+                        </div>
+                        <div class="junip-product-summary-star junip-star-outline" style="height: 20px; width: 20px; padding: 2px; z-index: inherit;">
+                          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" role="img" style="display: block; margin: auto; width: auto; height: auto;">
+                            <title>Outline star</title>
+                            <path d="m3.2 16.0001081c-.1687782 0-.33328968-.0531313-.47-.1521081-.24051968-.174488-.36451194-.4679107-.322-.762l.743-5.203-2.917-2.917c-.21191095-.21196521-.28756133-.52460199-.196-.81.09130759-.2851682.3345701-.49522345.63-.544l4.398-.734 2.218-4.435c.13744692-.27145241.41573373-.4426761.72-.443.3045618.00166772.58175678.1761261.715.45l2.123 4.362 4.498.801c.2933158.05211246.5333796.26289081.623.547.0898959.28455453.0135125.59548872-.198.806l-2.917 2.917.744 5.203c.042199.2957461-.0839008.5903645-.327.764-.2421349.1739598-.5609835.1986349-.827.064l-4.382-2.22-4.502 2.223c-.10996656.0547452-.23116004.0831081-.354.0831081zm1.51-2.8841081 3.357-1.658.892.452 2.327 1.178-.56-3.912.708-.707 1.29-1.29-3.234-.576-.446-.915-1.06-2.176-1.584 3.171-1.005.168-2.098.35 1.975 1.975-.141.99z" fill="var(--junipStarColor)"/>
+                          </svg>
+                        </div>
+                        <div class="junip-product-summary-star junip-star-outline" style="height: 20px; width: 20px; padding: 2px; z-index: inherit;">
+                          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" role="img" style="display: block; margin: auto; width: auto; height: auto;">
+                            <title>Outline star</title>
+                            <path d="m3.2 16.0001081c-.1687782 0-.33328968-.0531313-.47-.1521081-.24051968-.174488-.36451194-.4679107-.322-.762l.743-5.203-2.917-2.917c-.21191095-.21196521-.28756133-.52460199-.196-.81.09130759-.2851682.3345701-.49522345.63-.544l4.398-.734 2.218-4.435c.13744692-.27145241.41573373-.4426761.72-.443.3045618.00166772.58175678.1761261.715.45l2.123 4.362 4.498.801c.2933158.05211246.5333796.26289081.623.547.0898959.28455453.0135125.59548872-.198.806l-2.917 2.917.744 5.203c.042199.2957461-.0839008.5903645-.327.764-.2421349.1739598-.5609835.1986349-.827.064l-4.382-2.22-4.502 2.223c-.10996656.0547452-.23116004.0831081-.354.0831081zm1.51-2.8841081 3.357-1.658.892.452 2.327 1.178-.56-3.912.708-.707 1.29-1.29-3.234-.576-.446-.915-1.06-2.176-1.584 3.171-1.005.168-2.098.35 1.975 1.975-.141.99z" fill="var(--junipStarColor)"/>
+                          </svg>
+                        </div>
+                      
+                    </div>
+                    <div class="junip-stars-filled" style="width: ${item.productRating*20}%; display: flex; align-items: center; position: absolute; top: 0; left: 0; overflow: hidden; height: 100%;">
+                      
+                        <div class="junip-product-summary-star junip-star-filled" style="height: 20px; width: 20px; padding: 2px; z-index: inherit; flex-shrink: 0;">
+                          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" role="img" style="display: block; margin: auto; width: auto; height: auto;">
+                            <title>Filled star</title>
+                            <path d="m3.2 16.0001081c-.1687782 0-.33328968-.0531313-.47-.1521081-.24051968-.174488-.36451194-.4679107-.322-.762l.743-5.203-2.917-2.917c-.21191095-.21196521-.28756133-.52460199-.196-.81.09130759-.2851682.3345701-.49522345.63-.544l4.398-.734 2.218-4.435c.13744692-.27145241.41573373-.4426761.72-.443.3045618.00166772.58175678.1761261.715.45l2.123 4.362 4.498.801c.2933158.05211246.5333796.26289081.623.547.0898959.28455453.0135125.59548872-.198.806l-2.917 2.917.744 5.203c.042199.2957461-.0839008.5903645-.327.764-.2421349.1739598-.5609835.1986349-.827.064l-4.382-2.22-4.502 2.223c-.10996656.0547452-.23116004.0831081-.354.0831081z" fill="var(--junipStarColor)"/>
+                          </svg>
+                        </div>
+                        <div class="junip-product-summary-star junip-star-filled" style="height: 20px; width: 20px; padding: 2px; z-index: inherit; flex-shrink: 0;">
+                          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" role="img" style="display: block; margin: auto; width: auto; height: auto;">
+                            <title>Filled star</title>
+                            <path d="m3.2 16.0001081c-.1687782 0-.33328968-.0531313-.47-.1521081-.24051968-.174488-.36451194-.4679107-.322-.762l.743-5.203-2.917-2.917c-.21191095-.21196521-.28756133-.52460199-.196-.81.09130759-.2851682.3345701-.49522345.63-.544l4.398-.734 2.218-4.435c.13744692-.27145241.41573373-.4426761.72-.443.3045618.00166772.58175678.1761261.715.45l2.123 4.362 4.498.801c.2933158.05211246.5333796.26289081.623.547.0898959.28455453.0135125.59548872-.198.806l-2.917 2.917.744 5.203c.042199.2957461-.0839008.5903645-.327.764-.2421349.1739598-.5609835.1986349-.827.064l-4.382-2.22-4.502 2.223c-.10996656.0547452-.23116004.0831081-.354.0831081z" fill="var(--junipStarColor)"/>
+                          </svg>
+                        </div>
+                        <div class="junip-product-summary-star junip-star-filled" style="height: 20px; width: 20px; padding: 2px; z-index: inherit; flex-shrink: 0;">
+                          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" role="img" style="display: block; margin: auto; width: auto; height: auto;">
+                            <title>Filled star</title>
+                            <path d="m3.2 16.0001081c-.1687782 0-.33328968-.0531313-.47-.1521081-.24051968-.174488-.36451194-.4679107-.322-.762l.743-5.203-2.917-2.917c-.21191095-.21196521-.28756133-.52460199-.196-.81.09130759-.2851682.3345701-.49522345.63-.544l4.398-.734 2.218-4.435c.13744692-.27145241.41573373-.4426761.72-.443.3045618.00166772.58175678.1761261.715.45l2.123 4.362 4.498.801c.2933158.05211246.5333796.26289081.623.547.0898959.28455453.0135125.59548872-.198.806l-2.917 2.917.744 5.203c.042199.2957461-.0839008.5903645-.327.764-.2421349.1739598-.5609835.1986349-.827.064l-4.382-2.22-4.502 2.223c-.10996656.0547452-.23116004.0831081-.354.0831081z" fill="var(--junipStarColor)"/>
+                          </svg>
+                        </div>
+                        <div class="junip-product-summary-star junip-star-filled" style="height: 20px; width: 20px; padding: 2px; z-index: inherit; flex-shrink: 0;">
+                          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" role="img" style="display: block; margin: auto; width: auto; height: auto;">
+                            <title>Filled star</title>
+                            <path d="m3.2 16.0001081c-.1687782 0-.33328968-.0531313-.47-.1521081-.24051968-.174488-.36451194-.4679107-.322-.762l.743-5.203-2.917-2.917c-.21191095-.21196521-.28756133-.52460199-.196-.81.09130759-.2851682.3345701-.49522345.63-.544l4.398-.734 2.218-4.435c.13744692-.27145241.41573373-.4426761.72-.443.3045618.00166772.58175678.1761261.715.45l2.123 4.362 4.498.801c.2933158.05211246.5333796.26289081.623.547.0898959.28455453.0135125.59548872-.198.806l-2.917 2.917.744 5.203c.042199.2957461-.0839008.5903645-.327.764-.2421349.1739598-.5609835.1986349-.827.064l-4.382-2.22-4.502 2.223c-.10996656.0547452-.23116004.0831081-.354.0831081z" fill="var(--junipStarColor)"/>
+                          </svg>
+                        </div>
+                        <div class="junip-product-summary-star junip-star-filled" style="height: 20px; width: 20px; padding: 2px; z-index: inherit; flex-shrink: 0;">
+                          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" role="img" style="display: block; margin: auto; width: auto; height: auto;">
+                            <title>Filled star</title>
+                            <path d="m3.2 16.0001081c-.1687782 0-.33328968-.0531313-.47-.1521081-.24051968-.174488-.36451194-.4679107-.322-.762l.743-5.203-2.917-2.917c-.21191095-.21196521-.28756133-.52460199-.196-.81.09130759-.2851682.3345701-.49522345.63-.544l4.398-.734 2.218-4.435c.13744692-.27145241.41573373-.4426761.72-.443.3045618.00166772.58175678.1761261.715.45l2.123 4.362 4.498.801c.2933158.05211246.5333796.26289081.623.547.0898959.28455453.0135125.59548872-.198.806l-2.917 2.917.744 5.203c.042199.2957461-.0839008.5903645-.327.764-.2421349.1739598-.5609835.1986349-.827.064l-4.382-2.22-4.502 2.223c-.10996656.0547452-.23116004.0831081-.354.0831081z" fill="var(--junipStarColor)"/>
+                          </svg>
+                        </div>
+                      
+                    </div>
+                  </div>
+                  
+                    <div class="junip-product-summary-review-count" style="color: inherit; margin-left: 3px;">
+                      (${item.productCount})
+                    </div>
+                  
+                </div>
+              </div>
+            
+          
+        </span>`
+
+    const cardBottom = `<div id="recently-product-card-price">${item.productPrice}</div>
+        <form id="recently-product-card-add-to-cart-form" method="post" action="/cart/add" data-productid="{{ product.id }}">
+<!-- Begin ReCharge code -->
+{% if product.available %}{% render 'subscription-product' with product as product %}{% endif %}
+<!-- End ReCharge code -->
+
+          <input type="hidden" name="id" data-productid="{{ product.id }}" value="${item.productId}" />
+          <input type="hidden" min="1" type="number" id="quantity" name="quantity" value="1"/>
+          <input id="recently-product-card-submit" type="submit" value="ADD TO BAG" class="btn" />
+        </form>
+      </div>
+    </div>`
+
+    if(item.productCount > 0){
+      recentlyViewedHtml.unshift(`${cardTop}${cardReview}${cardBottom}`);
+    } else{
+      recentlyViewedHtml.unshift(`${cardTop}${cardBottom}`)
+    }
+    
+    
+  });
+  const newProductData = `${recentlyViewedHtml.join("")}`;
+  const fullContent = document.getElementsByClassName("recently-viewed-products");
+  fullContent[0].innerHTML = newProductData;
+}
+
+document.addEventListener("DOMContentLoaded", function (event) {
+  getRecentlyViewedProducts();
+});
+
+</script>
+{% schema %}
+  {
+    "name": "Recently Products",
+    "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "default": "Recently Viewed",
+          "label": "Heading"
+        }
+	],
+    "presets": [
+      {
+        "name": "Recently Products"
+      }
+    ]
+  }
+{% endschema %}

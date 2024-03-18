@@ -1,6 +1,9 @@
 {{ 'section-blog-post.css' | asset_url | stylesheet_tag }}
 
 <article class="article-template" itemscope itemtype="http://schema.org/BlogPosting">
+  {% if article.tags.size > 0 %}
+    <div class="article-tag">{{ article.tags[0] }}</div>
+  {% endif %}
   {%- for block in section.blocks -%}
     {%- case block.type -%}
       {%- when '@app' -%}
@@ -35,14 +38,18 @@
         {%- when 'title'-%}
           <header class="page-width page-width--narrow" {{ block.shopify_attributes }}>
             <h1 class="article-template__title" itemprop="headline">{{ article.title | escape }}</h1>
+            {%- if block.settings.blog_show_author -%}
+              <span class="caption-with-letter-spacing" itemprop="author" itemscope itemtype="http://schema.org/Person">
+                <span itemprop="name">by {{ article.author }}</span>
+              </span>
+            {%- endif -%}
+            {%- if block.settings.blog_show_author and block.settings.blog_show_date -%}
+              &nbsp;|&nbsp;
+            {%- endif -%}
             {%- if block.settings.blog_show_date -%}
               <span class="circle-divider caption-with-letter-spacing" itemprop="dateCreated pubdate datePublished">{{ article.published_at | time_tag: format: 'date' }}</span>
             {%- endif -%}
-            {%- if block.settings.blog_show_author -%}
-              <span class="caption-with-letter-spacing" itemprop="author" itemscope itemtype="http://schema.org/Person">
-                <span itemprop="name">{{ article.author }}</span>
-              </span>
-            {%- endif -%}
+            
           </header>
 
         {%- when 'content'-%}
@@ -182,7 +189,7 @@
                   {% endif %}
                   placeholder="{{ 'blogs.article.name' | t }}"
                 >
-                <label class="field__label" for="CommentForm-author">{{ 'blogs.article.name' | t }} <span aria-hidden="true">*</span></label>
+                <label class="field__label" for="CommentForm-author">Name</label>
                 {%- if form.errors contains 'author' -%}
                   <small id="CommentForm-author-error">
                     <span class="form__message">{% render 'icon-error' %}{{ 'blogs.article.name' | t }} {{ form.errors.messages['author'] }}.</span>
@@ -207,7 +214,7 @@
                   {% endif %}
                   placeholder="{{ 'blogs.article.email' | t }}"
                 >
-                <label class="field__label" for="CommentForm-email">{{ 'blogs.article.email' | t }} <span aria-hidden="true">*</span></label>
+                <label class="field__label" for="CommentForm-email">{{ 'blogs.article.email' | t }}</label>
                 {%- if form.errors contains 'email' -%}
                   <small id="CommentForm-email-error">
                     <span class="form__message">{% render 'icon-error' %}{{ 'blogs.article.email' | t }} {{ form.errors.messages['email'] }}.</span>
@@ -229,7 +236,7 @@
                 {% endif %}
                 placeholder="{{ 'blogs.article.message' | t }}"
               >{{ form.body }}</textarea>
-                <label class="form__label field__label" for="CommentForm-body">{{ 'blogs.article.message' | t }} <span aria-hidden="true">*</span></label>
+                <label class="form__label field__label" for="CommentForm-body">Message</label>
             </div>
             {%- if form.errors contains 'body' -%}
               <small id="CommentForm-body-error">
@@ -240,14 +247,14 @@
           {%- if blog.moderated? -%}
             <p class="article-template__comment-warning caption">{{ 'blogs.article.moderated' | t }}</p>
           {%- endif -%}
-          <input type="submit" class="button" value="{{ 'blogs.article.post' | t }}">
+          <input style="font-family:'Inter'; font-size:16px; text-transform: capitalize;"type="submit" class="button" value="{{ 'blogs.article.post' | t }}">
         {% endform %}
       </div>
   </div>
   {%- endif -%}
 </article>
 
-<script type="application/ld+json">
+{% comment %}<script type="application/ld+json">
   {
     "@context": "http://schema.org",
     "@type": "Article",
@@ -284,7 +291,7 @@
       "name": {{ shop.name | json }}
     }
   }
-  </script>
+  </script>{% endcomment %}
 
 
 {% schema %}

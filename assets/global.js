@@ -813,10 +813,11 @@ class VariantSelects extends HTMLElement {
   updateVariantInput() {
     const productForms = document.querySelectorAll(`#product-form-${this.dataset.section}, #product-form-installment-${this.dataset.section}`);
     productForms.forEach((productForm) => {
-      const input = productForm.querySelector('input[name="id"]');
+      const input = productForm.querySelector('input[data-productid]');
       input.value = this.currentVariant.id;
       input.dispatchEvent(new Event('change', { bubbles: true }));
     });
+    location.reload()
   }
 
   updatePickupAvailability() {

@@ -18,14 +18,43 @@
   }
 {%- endstyle -%}
 
-<div class="page-width page-width--narrow section-{{ section.id }}-padding">
-  <h1 class="main-page-title page-title h0">
-    {{ page.title | escape }}
-  </h1>
+{% if page.handle == 'concerns' %}
+  <div class="page-width section-{{ section.id }}-padding  page_c_{{ page.handle }}">  
+{% else %}
+  <div class="page-width page-width--narrow section-{{ section.id }}-padding  page_c_{{ page.handle }}">
+    <h1 class="main-page-title page-title h0">
+      {{ page.title | escape }}
+    </h1>
+{% endif %}
   <div class="rte">
     {{ page.content }}
   </div>
 </div>
+
+{% if page.title == "Loyalty Program" or page.title == "Sales & Promotions" %}
+  <style>
+    .page-width{
+      max-width:826px !important;
+    }
+  </style>
+{% endif %}
+
+{% if page.title == "About Us" %}
+  <style>
+    .main-page-title{
+      display:none;
+    }
+  </style>
+{% endif %}
+
+{% if page.handle == "concerns" %}
+  <script>
+    $(document).on('click','.concerns-card-header',function(){
+      $(this).toggleClass('collapsed');
+      $($(this).data('target')).toggleClass("show");
+    });
+  </script>
+{% endif %}
 
 {% schema %}
 {

@@ -1,0 +1,90 @@
+<div id="product-tabs-container">
+  <div id="tab-slider" class="splide">
+    <div class="splide__track">
+		<ul class="splide__list">
+    	  <li class="splide__slide splide-tab tab-active"><p>PRODUCT DESCRIPTION</p></li>
+          <li class="splide__slide splide-tab"><p>HOW TO USE</p></li>
+          <li class="splide__slide splide-tab"><p>INGREDIENTS</p></li>
+          <li class="splide__slide splide-tab"><p>SHIPPING & RETURNS</p></li>
+          <li class="splide__slide splide-tab"><p>FAQ'S</p></li>
+		</ul>
+    </div>
+  </div>
+<!--   <div class="selector">
+    <div class="tab tab-active">PRODUCT DESCRIPTION</div>
+    <div class="tab">HOW TO USE</div>
+    <div class="tab">INGREDIENTS</div>
+    <div class="tab">SHIPPING & RETURNS</div>
+    <div class="tab">FAQ'S</div>
+  </div> -->
+  <div class="content">
+    <div id="productdescription" class="content-body show-active"><span class="tab-content"><h2 style="visibility:hidden">Product Description</h2>{{ product.metafields["global"]["Product-description"] }}</span></div>
+    <div id="howtouse" class="content-body"><span class="tab-content"><h2 style="visibility:hidden">How To Use</h2>{{ product.metafields["global"]["How-to-use"] }}</span></div>
+    <div id="ingredients" class="content-body"><span class="tab-content"><h2 style="visibility:hidden">Ingredients</h2>{{ product.metafields["global"]["Ingredients"] }}</span></div>
+    <div id="shippingreturns"class="content-body"><span class="tab-content"><h2 style="visibility:hidden">Shipping & Returns</h2>{{ product.metafields["global"]["Shipping-and-returns"] }}</span></div>
+    <div id="faqs"class="content-body"><span class="tab-content"><h2 style="visibility:hidden">FAQs</h2>{{ product.metafields["global"]["Faqs"] }}</span></div>
+  </div>
+</div>
+
+<script>
+document.addEventListener( 'DOMContentLoaded', function () {
+var thumbnails = new Splide( '#tab-slider', {
+  		gap        : 10,
+  		rewind     : true,
+  		pagination : false,
+        cover      : true,
+        isNavigation: true
+    } ).mount();
+});
+
+
+</script>
+<script>
+const splideTabs = document.getElementsByClassName('splide-tab')
+const options = {
+  attributes: true
+}
+
+function callback(mutationList, observer) {
+  mutationList.forEach(function(mutation) {
+    if (mutation.type === 'attributes' && mutation.attributeName === 'class'){
+      if(mutation.target.classList.contains("is-active") && !mutation.target.classList.contains("tab-active")){
+        setNewActive(mutation.target);
+      }
+    }
+  })
+}
+for (let i = 0; i < splideTabs.length; i++) {
+   const observer = new MutationObserver(callback)
+   observer.observe(splideTabs[i], options)
+}
+</script>
+  
+
+<script>  
+  
+  const tabs = document.getElementsByClassName('splide-tab');
+  
+  function setNewActive(element){
+    const contentBodies = document.getElementsByClassName('content-body');
+    for(const contentBody of contentBodies){
+      contentBody.classList.remove('show-active');
+    }
+    document.getElementById(element.textContent.replace(/[!@#$%^&*'\s]/g, '').toLowerCase()).classList.add('show-active');
+    for(const tab of tabs){
+      tab.classList.remove('tab-active');
+    }
+    element.classList.add('tab-active')
+  } 
+  
+</script>
+{% schema %}
+  {
+    "name": "Product Tabs",
+    "presets": [
+      {
+        "name": "Product Tabs"
+      }
+    ]
+  }
+{% endschema %}

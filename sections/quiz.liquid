@@ -1,0 +1,351 @@
+{% schema %}
+{
+	"name": "Questions",
+	"settings": [
+		{
+            "id": "headline",
+			"type": "text",
+			"label": "Headline",
+			"default": "take THE QUIZ"
+		},
+		{
+            "id": "subheadline",
+			"type": "text",
+			"label": "Subtitle",
+			"default": "to find the perfect skincare solution just for you"
+		},
+        {
+            "type": "image_picker",
+            "id": "image_bg",
+            "label": "Background image"
+        }
+	],
+	"blocks": [
+		{ "name": "Question",
+			"type": "question",
+			"settings": [
+				{ "id": "question",
+					"type": "text",
+					"label": "Question"
+				},
+				{ "id": "answer1",
+					"type": "text",
+					"label": "Answer 1"
+				},
+                { "id": "answer1_tags",
+                    "type": "text",
+                    "label": "Answer 1 tags"
+                },
+                { "id": "answer2",
+                    "type": "text",
+                    "label": "Answer 2"
+                },
+                { "id": "answer2_tags",
+                    "type": "text",
+                    "label": "Answer 2 tags"
+                },
+                { "id": "answer3",
+                    "type": "text",
+                    "label": "Answer 3"
+                },
+                { "id": "answer3_tags",
+                    "type": "text",
+                    "label": "Answer 3 tags"
+                },
+                { "id": "answer4",
+                    "type": "text",
+                    "label": "Answer 4"
+                },
+                { "id": "answer4_tags",
+                    "type": "text",
+                    "label": "Answer 4 tags"
+                },
+                { "id": "answer5",
+                    "type": "text",
+                    "label": "Answer 5"
+                },
+                { "id": "answer5_tags",
+                    "type": "text",
+                    "label": "Answer 5 tags"
+                },
+                { "id": "answer6",
+                    "type": "text",
+                    "label": "Answer 6"
+                },
+                { "id": "answer6_tags",
+                    "type": "text",
+                    "label": "Answer 6 tags"
+                }
+			]
+		}
+	]
+}
+{% endschema %}
+
+{% stylesheet 'scss' %}
+
+$font-didot: "Didot", "Times New Roman", "Times", "Baskerville", "Georgia", serif;
+$font-futura: "futura", "Arial", "Helvetica Neue", "Helvetica", sans-serif;
+
+
+
+#quiz {
+    text-align: center;
+    .font-didot {
+        font-family: $font-didot;
+        font-style: italic;
+    }
+    .start {
+        max-width: 800px;
+		max-height: 500px !important;
+        margin: 0 auto;
+		background-size: cover;
+		padding-top: 100px;
+		padding-bottom: 200px;
+
+	.headline {
+            font-size: 42px;
+            font-style: italic;
+            font-family: $font-didot;
+            margin-bottom: -47rem !important;
+
+            text-transform: uppercase;
+
+			padding-top: 520px;
+    		padding-bottom: 200px;
+        }
+        .sub-headline {
+            font-size: 28px;
+            margin-bottom: 2rem;
+            line-height: 1.3;
+            max-width: 350px;
+			padding-top: 600px;
+			padding-bottom: 850px;
+        }
+        .inner {
+            width: 100%;
+            padding-bottom: 100%;
+            position: relative;
+            .quiz-content {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+        }
+    }
+    .questions {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        .question-count {
+            font-size: 30px;
+            font-family: $font-didot;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+        .question-title {
+            font-size: 30px !important;
+            font-family: $font-futura;
+            margin-bottom: 3rem;
+        }
+        .questions-nav {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 100%;
+        }
+    }
+    .answers {
+        background: #f3e2d6;
+        padding: 3rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        .answer {
+            margin: 0 2rem 2rem;
+            padding: 20px;
+            border-radius: 35px;
+            background: #fff;
+            cursor: pointer;
+            width: 300px;
+            text-align: center;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+            &.active {
+                box-shadow: 0 2px 10px 1px rgba(0, 0, 0, 0.5) !important;
+            }
+        }
+    }
+}
+
+.animated {
+    animation-duration: 1s;
+    animation-fill-mode: both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.fadeIn {
+  animation-name: fadeIn;
+}
+
+@media (print), (prefers-reduced-motion) {
+    .animated {
+        animation: unset !important;
+        transition: none !important;
+    }
+}
+
+{% endstylesheet %}
+
+{% javascript %}
+
+var questions = {
+    next: function() {
+        var c = $('.question:visible');
+        var n = c.next('.question');
+        if (n.length > 0) {
+            this.hide(c);
+            this.show(n);
+        } else {
+            // at the end
+            //alert('redirection will happen now');
+            var tags = $('#quiz .answer.active').filter(function() {
+                return $(this).data('tags') != '';
+            }).map(function() {
+                return questions.handle($(this).data('tags').toLowerCase());
+            }).toArray();
+            console.log(tags);
+            console.log('test');
+            var redirectURL = '/collections/tailored-treatments/'+tags.join('+')+'?view=quiz';
+			console.log(redirectURL);
+            location.href = redirectURL;
+        }
+    },
+    handle: function(value) {
+        return value.toLowerCase().replace(/\s/g, '-').replace(/[^a-zA-Z0-9-]/g, '').replace(/-+/g, '-');
+    },
+    back: function() {
+        var c = $('.question:visible');
+        var p = c.prev('.question');
+        if (p.length > 0) {
+            this.hide(c);
+            this.show(p);
+        } else {
+            // do nonthing
+            return false;
+        }
+    },
+    start: function() {
+        this.hide($('.start'));
+        $('.question:first').show();
+        this.show($('.questions'));
+    },
+    hide: function (el) {
+        el.hide();
+    },
+    show: function (el) {
+        el.show();
+    }
+}
+
+jQuery(document).ready(function($) {
+    $('.start .btn').click(function (e) {
+        e.preventDefault();
+        questions.start();
+    })
+    $('.questions-nav .back').click(function (e) {
+        e.preventDefault();
+        questions.back();
+    });
+    $('.questions-nav .next').click(function (e) {
+        e.preventDefault();
+        questions.next();
+    });
+    $('.question .answer').click(function (e) {
+        e.preventDefault();
+        $(this).addClass('active').siblings().removeClass('active');
+    })
+});
+
+{% endjavascript %}
+
+
+
+<div id="quiz">
+    <div class="page-width page-width-913">
+        <div class="start" style="background-image: url({{ section.settings.image_bg | img_url: '1000x' }})">
+            <div class="inner">
+                <div class="quiz-content">
+                  <div><h1 class="headline">{{ section.settings.headline }}</h1></div>
+                  <div class="sub-headline">{{ section.settings.subheadline }}</div>
+                  <a href="#" class="btn">Start</a>
+                </div>
+            </div>
+        </div>
+        <div class="questions" style="display: none;">
+            {% for block in section.blocks %}
+            <div class="question animated fadeIn" style="display: none;">
+                <div class="question-count">Question{{ forloop.index }} </div>
+                <div class="question-title">{{ block.settings.question }}</div>
+                <div class="answers">
+                    {% for i in (1..6) %}
+                        {% assign answer = 'answer' | append: forloop.index %}
+                        {% assign answer_tags = 'answer' | append: forloop.index | append: '_tags' %}
+                        {% if block.settings[answer] != ''  %}
+                            <div class="answer" data-tags="{{ block.settings[answer_tags] }}">{{ block.settings[answer] }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            <div class="questions-nav font-didot">
+                <a href="#" class="back">&lt; Back </a>
+                <a href="#" class="next">Next &gt;</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+
+@media only screen and (max-width: 450px) {
+    #quiz .start .sub-headline{
+        padding-bottom:450px
+    }}
+
+@media only screen and (max-width: 450px) {
+	[id="main"]{
+		padding-bottom: 40px;
+    }
+}
+@media only screen and (max-width: 450px) {
+  	button.ga-product_addtocart, .btn{
+        position: absolute;
+      	top: 320px;
+
+    }
+}
+
+
+</style>
+
+

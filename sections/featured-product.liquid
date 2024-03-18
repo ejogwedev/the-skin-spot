@@ -128,44 +128,51 @@
                 {%- endif -%}
                 {%- if product != blank -%}
                   <div {{ block.shopify_attributes }}>
-                    {%- form 'product', product -%}
-                      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                    {%- form 'product', product, data-productid: product.id -%}
+<!-- Begin ReCharge code -->
+{% if product.available %}{% render 'subscription-product' with product as product %}{% endif %}
+<!-- End ReCharge code -->
+
+                      <input type="hidden" name="id" data-productid="{{ product.id }}" value="{{ product.selected_or_first_available_variant.id }}">
                       {{ form | payment_terms }}
                     {%- endform -%}
                   </div>
                 {%- endif -%}
               {%- when 'quantity_selector' -%}
-                <div
-                  class="product-form__input product-form__quantity{% if settings.inputs_shadow_vertical_offset != 0 and settings.inputs_shadow_vertical_offset < 0 %} product-form__quantity-top{% endif %}"
-                  {{ block.shopify_attributes }}
-                >
-                  <label class="form__label" for="Quantity-{{ section.id }}">
-                    {{ 'products.product.quantity.label' | t }}
-                  </label>
-                  <quantity-input class="quantity">
-                    <button class="quantity__button no-js-hidden" name="minus" type="button">
-                      <span class="visually-hidden">
-                        {{- 'products.product.quantity.decrease' | t: product: product.title | escape -}}
-                      </span>
-                      {% render 'icon-minus' %}
-                    </button>
-                    <input
-                      class="quantity__input"
-                      type="number"
-                      name="quantity"
-                      id="Quantity-{{ section.id }}"
-                      min="1"
-                      value="1"
-                      form="{{ product_form_id }}"
-                    >
-                    <button class="quantity__button no-js-hidden" name="plus" type="button">
-                      <span class="visually-hidden">
-                        {{- 'products.product.quantity.increase' | t: product: product.title | escape -}}
-                      </span>
-                      {% render 'icon-plus' %}
-                    </button>
-                  </quantity-input>
-                </div>
+                {% capture var %}{% render 'locksmith-variables', variable: 'access_granted', scope: 'subject', subject: product %}{% endcapture %}{% if var == 'true' %}{% assign locksmith_access_granted = true %}{% else %}{% assign locksmith_access_granted = false %}{% endif %}
+                {% if locksmith_access_granted %}              
+                  <div
+                    class="product-form__input product-form__quantity{% if settings.inputs_shadow_vertical_offset != 0 and settings.inputs_shadow_vertical_offset < 0 %} product-form__quantity-top{% endif %}"
+                    {{ block.shopify_attributes }}
+                  >
+                    <label class="form__label" for="Quantity-{{ section.id }}">
+                      {{ 'products.product.quantity.label' | t }}
+                    </label>
+                    <quantity-input class="quantity">
+                      <button class="quantity__button no-js-hidden" name="minus" type="button">
+                        <span class="visually-hidden">
+                          {{- 'products.product.quantity.decrease' | t: product: product.title | escape -}}
+                        </span>
+                        {% render 'icon-minus' %}
+                      </button>
+                      <input
+                        class="quantity__input"
+                        type="number"
+                        name="quantity"
+                        id="Quantity-{{ section.id }}"
+                        min="1"
+                        value="1"
+                        form="{{ product_form_id }}"
+                      >
+                      <button class="quantity__button no-js-hidden" name="plus" type="button">
+                        <span class="visually-hidden">
+                          {{- 'products.product.quantity.increase' | t: product: product.title | escape -}}
+                        </span>
+                        {% render 'icon-plus' %}
+                      </button>
+                    </quantity-input>
+                  </div>
+                {% endif %}  
               {%- when 'share' -%}
                 <script src="{{ 'share.js' | asset_url }}" defer="defer"></script>
                 <share-button id="Share-{{ section.id }}" class="share-button" {{ block.shopify_attributes }}>
@@ -288,7 +295,7 @@
                     </label>
                     <div class="select">
                       <select
-                        name="id"
+                        name="id" data-productid="{{ product.id }}"
                         id="Variants-{{ section.id }}"
                         class="select__select"
                         form="{{ product_form_id }}"
@@ -333,46 +340,55 @@
                         <span class="product-form__error-message"></span>
                       </div>
 
-                      {%- form 'product', product, id: product_form_id, class: 'form', novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+                      {%- form 'product', product, data-productid: product.id, id: product_form_id, class: 'form', novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+<!-- Begin ReCharge code -->
+{% if product.available %}{% render 'subscription-product' with product as product %}{% endif %}
+<!-- End ReCharge code -->
+
                         <input
                           type="hidden"
-                          name="id"
+                          name="id" data-productid="{{ product.id }}"
                           value="{{ product.selected_or_first_available_variant.id }}"
                           disabled
                         >
-                        <div class="product-form__buttons">
-                          <button
-                            type="submit"
-                            name="add"
-                            class="product-form__submit button button--full-width {% if block.settings.show_dynamic_checkout %}button--secondary{% else %}button--primary{% endif %}"
-                            {% if product.selected_or_first_available_variant.available == false %}
-                              disabled
-                            {% endif %}
-                          >
-                            <span>
-                              {%- if product.selected_or_first_available_variant.available -%}
-                                {{ 'products.product.add_to_cart' | t }}
-                              {%- else -%}
-                                {{ 'products.product.sold_out' | t }}
-                              {%- endif -%}
-                            </span>
-                            <div class="loading-overlay__spinner hidden">
-                              <svg
-                                aria-hidden="true"
-                                focusable="false"
-                                role="presentation"
-                                class="spinner"
-                                viewBox="0 0 66 66"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
-                              </svg>
-                            </div>
-                          </button>
-                          {%- if block.settings.show_dynamic_checkout -%}
-                            {{ form | payment_button }}
-                          {%- endif -%}
-                        </div>
+                        
+                        {% if locksmith_access_granted %}
+                          <div class="product-form__buttons">
+                            <button
+                              type="submit"
+                              name="add"
+                              class="product-form__submit button button--full-width {% if block.settings.show_dynamic_checkout %}button--secondary{% else %}button--primary{% endif %}"
+                              {% if product.selected_or_first_available_variant.available == false %}
+                                disabled
+                              {% endif %}
+                            >
+                              <span>
+                                {%- if product.selected_or_first_available_variant.available -%}
+                                  {{ 'products.product.add_to_cart' | t }}
+                                {%- else -%}
+                                  {{ 'products.product.sold_out' | t }}
+                                {%- endif -%}
+                              </span>
+                              <div class="loading-overlay__spinner hidden">
+                                <svg
+                                  aria-hidden="true"
+                                  focusable="false"
+                                  role="presentation"
+                                  class="spinner"
+                                  viewBox="0 0 66 66"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                                </svg>
+                              </div>
+                            </button>
+                            {%- if block.settings.show_dynamic_checkout -%}
+                              {{ form | payment_button }}
+                            {%- endif -%}
+                          </div>
+                        {% else %}
+                          <button class="locksmith-manual-trigger btn button">Click for pricing</button>
+                        {% endif %}                            
                       {%- endform -%}
                     </product-form>
                   {%- else -%}
@@ -549,7 +565,7 @@
   endif
 -%}
 
-<script type="application/ld+json">
+{% comment %}<script type="application/ld+json">
   {
     "@context": "http://schema.org/",
     "@type": "Product",
@@ -592,7 +608,7 @@
       {%- endfor -%}
     ]
   }
-</script>
+</script>{% endcomment %}
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -605,7 +621,7 @@
     }
 
     if (!isIE()) return;
-    const hiddenInput = document.querySelector('#{{ product_form_id }} input[name="id"]');
+    const hiddenInput = document.querySelector('#{{ product_form_id }} input[name="id" data-productid="{{ product.id }}"]');
     const noScriptInputWrapper = document.createElement('div');
     const variantSwitcher = document.querySelector('variant-radios[data-section="{{ section.id }}"]') || document.querySelector('variant-selects[data-section="{{ section.id }}"]');
     noScriptInputWrapper.innerHTML = document.querySelector('.product-form__noscript-wrapper-{{ section.id }}').textContent;

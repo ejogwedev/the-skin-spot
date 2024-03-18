@@ -1,0 +1,60 @@
+<div class="banner-top style-02" style="background-image:url(https://cdn.shopify.com/s/files/1/0066/5681/9236/t/5/assets/shop-1555384912127.jpg)">
+    <div class="hold"><div class="page-width"><p class="h1"></p></div></div>
+</div>
+<div class="page-width page-width-913  page_c_{{ page.handle }}">
+    <div class="section-header text-center">
+        <h1>Shop</h1>
+    </div>
+    {% assign collection_handle = "collections" %}
+    {% if linklists[collection_handle].links.size > 0 %}
+        <div class="collections-sort">
+
+            <ul class="header-sort">
+                {% for link in linklists[collection_handle].links %}
+                    <li {% if link.links == blank %}class="default"{% endif %}><a href="{{ link.url }}">{{ link.title }}</a></li>
+                {% endfor %}
+            </ul>
+
+            <ul class="list-collections">
+              {% for link in linklists[collection_handle].links %}
+                {% if link.links != blank %}
+                    <li id="{{ link.title | downcase }}"><span class="title-row">{{ link.title }}</span>
+                        <ul>
+                            {% if link.links != blank %}
+                                {% capture child_list_handle %}{{ link.handle }}-{{ outerLoopIndex }}{% endcapture %}
+                                {% for childlink in link.links %}
+                                    <li><a href="{{ childlink.url }}">{{ childlink.title }}</a></li>
+                                {% endfor %}
+                            {% endif %}
+                        </ul>
+                    </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+
+        </div>
+    {% endif %}
+
+</div>
+<style> html { scroll-behavior: smooth; } 
+.banner-top {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    width: 100%;
+    background-size: cover;
+    background-position: 50% 50%;
+    min-height:390px;
+}
+.banner-top.style-02 .hold {
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+.section-header {
+    padding: 20px 0;
+    background-color: #fff9f5;
+    margin-bottom: 20px;
+    text-align: center;
+}
+</style>

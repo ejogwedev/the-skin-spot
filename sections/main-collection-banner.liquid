@@ -1,3 +1,4 @@
+<!--main-collection-banner.liquid---------------->
 {% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
 {{ 'component-collection-hero.css' | asset_url | stylesheet_tag }}
 
@@ -9,19 +10,26 @@
   }
 {%- endstyle -%}
 
-<div class="collection-hero{% if section.settings.show_collection_image and collection.image %} collection-hero--with-image{% endif %} color-{{ section.settings.color_scheme }} gradient">
+<div class="clearfix collection-hero{% if section.settings.show_collection_image and collection.image %} collection-hero--with-image{% endif %} color-{{ section.settings.color_scheme }} gradient">
   <div class="collection-hero__inner page-width">
     <div class="collection-hero__text-wrapper">
+<a href="{{ collections_url }}">
+<div class="collection-path">
+  <a href="/collections">Collections</a> / <a href="{{ collection.url }}">{{ collection.title }}</a>
+</div>
+
+</a>
+
       <h1 class="collection-hero__title">
-        <span class="visually-hidden">{{ 'sections.collection_template.title' | t }}: </span>
         {{- collection.title | escape -}}
       </h1>
 
       {%- if section.settings.show_collection_description -%}
         <div class="collection-hero__description rte">{{ collection.description }}</div>
       {%- endif -%}
+      
     </div>
-
+    
     {%- if section.settings.show_collection_image and collection.image -%}
       <div class="collection-hero__image-container media gradient">
         <img
@@ -41,6 +49,7 @@
       </div>
     {%- endif -%}
   </div>
+  <img class="collection-banner-img" src="https://cdn.shopify.com/s/files/1/0066/5681/9236/files/whats_app_1-min.png?v=1676186715">
 </div>
 
 {% schema %}
