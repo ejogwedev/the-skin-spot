@@ -1,0 +1,27 @@
+{% assign img = '' %}
+{% assign text = '' %}
+{% assign style = '' %}
+
+{% if page.handle %}
+    {% assign img = page.metafields["global"]["Banner-image"] %}
+    {% assign text = page.metafields["global"]["Banner-text"] %}
+    {% assign style = page.metafields["global"]["Banner-text-style"] %}
+{% endif %}
+
+{% if blog.handle %}
+    {% assign img = blog.metafields["global"]["Banner-image"] %}
+    {% assign text = blog.metafields["global"]["Banner-text"] %}
+    {% assign style = blog.metafields["global"]["Banner-text-style"] %}
+{% endif %}
+
+{% if collection.handle %}
+    {% assign img = collection.metafields["global"]["Banner-image"] %}
+    {% assign text = collection.metafields["global"]["Banner-text"] %}
+    {% assign style = collection.metafields["global"]["Banner-text-style"] %}
+{% endif %}
+
+{% if img != blank or text != blank %}
+    <div class="banner-top {{ style }}" {% if img %}style="background-image:url({{ img }})"{% endif %}>
+        {% if text %}<div class="hold"><div class="page-width"><p class="h1">{{blog.title}}</p></div></div>{% endif %}
+    </div>
+{% endif %}

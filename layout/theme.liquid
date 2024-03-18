@@ -1,36 +1,74 @@
-<!doctype html>
+{%- comment %}<locksmith:0ff5>{% endcomment -%}
+  {%- include 'locksmith' -%}
+{%- comment %}</locksmith:0ff5>{% endcomment -%}
+<!doctype html>  
 <html class="no-js" lang="{{ request.locale.iso_code }}">
   <head>
+{{ locksmith_initializations }}
+{% if first_time_accessed %}
+<script>                               
+window.dataLayer = window.dataLayer || [];                                            
+var shipping_price = '{{shipping_price | money_without_currency }}';
+shipping_price  = shipping_price.replace(",", ".");
+var total_price = '{{total_price | money_without_currency }}';
+total_price  = total_price.replace(",", ".");
+var tax_price = '{{tax_price | money_without_currency }}';
+tax_price  = tax_price.replace(",", ".");
+dataLayer.push({ ecommerce: null });  // Clear the previous ecommerce object.
+dataLayer.push({
+  event: "purchase",
+  ecommerce: {
+      'page_type': 'purchase',
+      'currency': "{{ shop.currency }}",
+      'value': total_price,
+      'shipping': shipping_price,
+      'tax': tax_price,
+      'payment_type': '{{order.transactions[0].gateway}}',
+      'transaction_id': "{{order.name}}",
+}
+});
+</script> 
+{% endif %}
+
+ {%- render 'layouthub_header' -%}
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="">
-    <link rel="canonical" href="{{ canonical_url }}">
+   {% if template contains 'search' %}
+  <meta name="robots" content="nofollow, noindex" />
+{% endif %}
+    <meta name="google-site-verification" content="fcK9NJCWqtW7oot836LXYqp-9kdJX5ZopJs3n467ejs" />
+{% if template contains 'collection' and current_tags %}
+  <link rel="canonical" href="{{ shop.url }}{{ collection.url }}" />
+{% else %}
+   <link rel="canonical" href="{{ canonical_url }}" />
+{% endif %}
     <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
-
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
     {%- endif -%}
-
     {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
       <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
     {%- endunless -%}
-
-    <title>
+    {%- comment smartseo_integration_begin_meta_data -%}<title>
       {{ page_title }}
       {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
       {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
       {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
-    </title>
+    </title>{%- endcomment smartseo_integration_end_meta_data -%}
 
     {% if page_description %}
-      <meta name="description" content="{{ page_description | escape }}">
+      {%- comment smartseo_integration_begin_meta_data -%}{%- comment smartseo_integration_begin_meta_data -%}{%- comment %}<locksmith:86f1>{% endcomment -%}{%- capture var %}{% render 'locksmith-variables', variable: 'transparent', hiding_scope: 'resource' %}{% endcapture %}{% if var == 'true' %}<meta name="description" content="{{ page_description | escape }}">{% endif -%}{%- comment %}original: <meta name="description" content="{{ page_description | escape }}">{%- endcomment %}{%- comment %}</locksmith:86f1>{% endcomment -%}{%- endcomment smartseo_integration_end_meta_data -%}{%- endcomment smartseo_integration_end_meta_data -%}
     {% endif %}
 
     {% render 'meta-tags' %}
+    {% if template == 'product' %}
+      <script  src="{{ 'splide.min.js' | asset_url }}"></script>
+    {% endif %}
 
-    <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
-    {{ content_for_header }}
+<script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
+    {% include 'globo.filter.script' %}{{ content_for_header }}
 
     {%- liquid
       assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
@@ -214,9 +252,47 @@
           font-size: 1.6rem;
         }
       }
+
+      /*   IMPORTED FONTS     */
+
+      @font-face {
+        font-family: "Tharlon";
+        src: url("https://cdn.shopify.com/s/files/1/0066/5681/9236/files/Tharlon-Regular.ttf?v=1674721272");
+        font-display: swap;
+      }
+
+      /*    VARIABLE STYLES    */
+
+      /*    Product Page    */
+
+      div#final-sale{
+        color:{{settings.colors_accent_2}};
+        font-size: 17px;
+      }
+
+      {% unless locksmith_access_granted %}
+        a.iWishAdd{
+          position: relative;
+          left: 210px;
+          bottom: 22px;
+        }
+      {% endunless %}
+      
     {% endstyle %}
 
+<!--     {{ 'old-style.css' | asset_url | stylesheet_tag }} -->
+    {{ 'theme-new.css' | asset_url | stylesheet_tag }}
+    {{ 'bootstrap.css' | asset_url | stylesheet_tag }}
+    {{ 'skin-quiz.css' | asset_url | stylesheet_tag }}
     {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'custom.css' | asset_url | stylesheet_tag }}
+    {{ 'new-custom.css' | asset_url | stylesheet_tag }}
+    {% if template == 'product' %}
+      {{ 'splide.min.css' | asset_url | stylesheet_tag }}
+    {% endif %}
+    {% if page.title == 'Loyalty Program' %}
+      {{ 'conditional.css' | asset_url | stylesheet_tag }}
+    {% endif %}
 
     {%- unless settings.type_body_font.system? -%}
       <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
@@ -234,11 +310,64 @@
       document.documentElement.classList.add('shopify-design-mode');
     }
     </script>
-  </head>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script
+    src="https://code.jquery.com/jquery-3.4.1.js"
+    integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+    crossorigin="anonymous">
+  </script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('.accordion-button').click(function() {
+        $(this).toggleClass('collapsed');
+      });
+    });
+  </script>
+  <script>
+    function toggleAccordion(collapseId) {
+      var accordion = document.getElementById(collapseId);
+      if (accordion) {
+        accordion.classList.toggle('show');
+      }
+    }
+  </script>
+  <script>
+    function toggleAccordion(collapseId) {
+      var accordion = document.getElementById(collapseId);
+      if (accordion) {
+        accordion.classList.toggle('show');
+        accordion.setAttribute('aria-expanded', accordion.classList.contains('show'));
+      }
+    }
+  </script>
+  <script>
+    function toggleAccordion(collapseId) {
+      var accordion = document.getElementById(collapseId);
+      if (accordion) {
+        accordion.style.display = accordion.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+  </script>
+
+    
+      {% include "loyaltylion" %}
+
+
+{%- include 'rebuy-templates' -%}
+
+  {% render 'qikify-apps' %}
+{% include 'add_header_assets' %}</head>
+
+<!-- Calendly link widget begin -->
+<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+<script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+<!-- Calendly link widget end -->
 
   <body class="gradient">
     <a class="skip-to-content-link button visually-hidden" href="#MainContent">
-      {{ "accessibility.skip_to_text" | t }}
+      {{ "accessibility.skip_to_text" | t }} 
     </a>
 
     {%- if settings.cart_type == 'drawer' -%}
@@ -246,12 +375,13 @@
     {%- endif -%}
 
     {% section 'announcement-bar' %}
-    {% section 'header' %}
+    {% section 'new-header' %}
+    
     <main id="MainContent" class="content-for-layout focus-none" role="main" tabindex="-1">
-      {{ content_for_layout }}
+      <div class="globoRecommendationsTop"></div><!--LayoutHub-Workspace-Start-->{{ content_for_layout }}<!--LayoutHub-Workspace-End--><div class="globoRecommendationsBottom"></div>
     </main>
 
-    {% section 'footer' %}
+    {% section 'new-footer' %}
 
     <ul hidden>
       <li id="a11y-refresh-page-message">{{ 'accessibility.refresh_page' | t }}</li>
@@ -286,9 +416,82 @@
         playSlideshow: `{{ 'sections.slideshow.play_slideshow' | t }}`,
       }
     </script>
-
+    
+  
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+      var lazyloadImages = document.querySelectorAll("img.lazy");    
+      var lazyloadThrottleTimeout;
+      
+      function lazyload () {
+        if(lazyloadThrottleTimeout) {
+          clearTimeout(lazyloadThrottleTimeout);
+        }    
+        
+        lazyloadThrottleTimeout = setTimeout(function() {
+            var scrollTop = window.pageYOffset;
+            lazyloadImages.forEach(function(img) {
+                if(img.offsetTop < (window.innerHeight + scrollTop)) {
+                  img.src = img.dataset.src;
+                  img.classList.remove('lazy');
+                }
+            });
+            if(lazyloadImages.length == 0) { 
+              document.removeEventListener("scroll", lazyload);
+              window.removeEventListener("resize", lazyload);
+              window.removeEventListener("orientationChange", lazyload);
+            }
+        }, 20);
+      }
+      
+      document.addEventListener("scroll", lazyload);
+      window.addEventListener("resize", lazyload);
+      window.addEventListener("orientationChange", lazyload);
+    });
+    </script>
     {%- if settings.predictive_search_enabled -%}
       <script src="{{ 'predictive-search.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
-  </body>
+    {% render 'junip-store-key' %}
+
+	
+	{% include 'globo.filter.action' %}
+	  
+{%- render 'layouthub_footer' -%} 
+   
+  
+<!-- Begin ReCharge code -->
+{% include 'subscription-theme-footer' %}
+<!-- End ReCharge code -->
+  
+  
+  <script> (function(){ var s = document.createElement('script'); var h = document.querySelector('head') || document.body; s.src = 'https://acsbapp.com/apps/app/dist/js/app.js'; s.async = true; s.onload = function(){ acsbJS.init({ statementLink : '', footerHtml : '', hideMobile : false, hideTrigger : false, disableBgProcess : false, language : 'en', position : 'right', leadColor : '#146FF8', triggerColor : '#146FF8', triggerRadius : '50%', triggerPositionX : 'right', triggerPositionY : 'bottom', triggerIcon : 'people', triggerSize : 'bottom', triggerOffsetX : 20, triggerOffsetY : 20, mobile : { triggerSize : 'small', triggerPositionX : 'right', triggerPositionY : 'bottom', triggerOffsetX : 10, triggerOffsetY : 10, triggerRadius : '20' } }); }; h.appendChild(s); })();</script>
+{% include 'adroll' %}
+
+
+    
+  <!--Route Code Edited 7/17/2023-->
+  {% render 'rebuy-cart-template' %} 
+  <!--Route Code End-->
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-MF2CQ45');</script>
+    <!-- End Google Tag Manager -->
+    
+      <!-- Google tag (gtag.js) -->
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=AW-10847444739"></script> -->
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    
+    gtag('config', 'AW-10847444739');
+    </script>
+
+
+  {% include 'add_footer_assets' %}</body>
 </html>

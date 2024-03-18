@@ -1,0 +1,82 @@
+{%- assign limit = section.settings.limit -%}
+
+{% include 'header-banner' %}
+
+<div class="page-width">
+    <div id="twocolumns">
+
+
+        {% paginate collection.products by 48 %}
+
+            <div id="content">
+
+                <div class="title-row text-center quiz-results-title">
+                  <h1>Your Results Are In!</h1>
+                  <div>Soothe, smooth, refine, and brighten your skin with these medical-grade skincare
+                  products curated specifically for your concerns. When creating your regimen, you want to include the GRASS method: Growth factor, Retinol, Antioxidant, Sunscreen, and Specialty product. By following the GRASS method, you are sure to achieve your skincare goals. Based on your answers, here are the products that will fulfill the GRASS method but also work with your skin type and lifestyle. We hope you enjoy and don’t forget
+                    to sign up for our Loyalty Program to accumulate Beauty Bucks towards future purchases!
+                  </div>
+              </div>
+
+                <ul class="list-four-columns{% comment %} AjaxinateLoop{% endcomment %}">
+                    {% for product in collection.products %}
+                      <li>
+                        {% include 'product-card-grid', max_height: max_height %}
+                      </li>
+                    {% else %}
+                      {% comment %}
+                      Add default products to help with onboarding for collections/all only.
+
+                      The onboarding styles and products are only loaded if the
+                      store has no products.
+                      {% endcomment %}
+                      {% if collection.handle == 'all' and collection.all_vendors.size == 0 and collection.all_types.size == 0 %}
+                        <li>
+                          <div class="grid grid--uniform">
+                            {% for i in (1..limit) %}
+                              <div class="grid__item {{ grid_item_width }}">
+                                <div class="grid-view-item">
+                                  <a href="#" class="grid-view-item__link">
+                                    <div class="grid-view-item__image">
+                                      {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+                                      {{ 'product-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+                                    </div>
+                                    <div class="h4 grid-view-item__title">{{ 'homepage.onboarding.product_title' | t }}</div>
+                                    <div class="grid-view-item__meta">
+                                      <span class="product-price__price">$19.99</span>
+                                    </div>
+                                  </a>
+                                </div>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        </li>
+                      {% else %}    
+                       {%- assign is_empty_collection = true -%}
+                      {% endif %}
+                    {% endfor %}
+                </ul>
+          
+            {% if is_empty_collection != true%}            
+                  <div class="grid__item small--text-center">
+                {% comment %}    <p class="text-center">{{ 'collections.general.no_matches' | t }}</p>{% endcomment %}                    
+                    <p class="text-center">Collection Not Found  </p>
+                  </div>
+          {% endif %}
+              {% comment %}
+                <div class="AjaxinatePagination">
+                    {% if paginate.next %}
+                      <a href="{{ paginate.next.url }}"></a>
+                    {% endif %}
+                </div>
+              {% endcomment %}
+
+              <div class="pagination-container">
+                {{ paginate | default_pagination }}
+              </div>
+
+            </div>
+        {% endpaginate %}
+
+    </div>
+</div>

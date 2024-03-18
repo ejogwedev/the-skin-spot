@@ -1,0 +1,46 @@
+{% capture var %}{% render 'locksmith-variables', variable: 'access_granted', scope: 'subject', subject: product %}{% endcapture %}
+{% if var == 'true' %}{% assign locksmith_access_granted = true %}{% else %}{% assign locksmith_access_granted = false %}{% endif %}
+
+<div id="product-card-container" class="iwishAddWrapColl" data-handle="{{ product.handle }}" data-iwish_variant="{{ product.variants.first.id }}" data-iwish_product="{{ product.id }}" data-iwish_pTitle="{{ product.title | escape }}">
+  <a href="#" class="iWishAddColl iwishcheck" data-product="{{product.id}}" data-variant="{{product.variants.first.id}}">
+    <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="20px" height="20px" viewBox="0 0 378.94 378.94" style="enable-background:new 0 0 378.94 378.94;" xml:space="preserve"><g><path d="M348.151,54.514c-19.883-19.884-46.315-30.826-74.435-30.826c-28.124,0-54.559,10.942-74.449,30.826l-9.798,9.8l-9.798-9.8c-19.884-19.884-46.325-30.826-74.443-30.826c-28.117,0-54.56,10.942-74.442,30.826c-41.049,41.053-41.049,107.848,0,148.885l147.09,147.091c2.405,2.414,5.399,3.892,8.527,4.461c1.049,0.207,2.104,0.303,3.161,0.303c4.161,0,8.329-1.587,11.498-4.764l147.09-147.091C389.203,162.362,389.203,95.567,348.151,54.514z M325.155,180.404L189.47,316.091L53.782,180.404c-28.368-28.364-28.368-74.514,0-102.893c13.741-13.739,32.017-21.296,51.446-21.296c19.431,0,37.702,7.557,51.438,21.296l21.305,21.312c6.107,6.098,16.897,6.098,23.003,0l21.297-21.312c13.737-13.739,32.009-21.296,51.446-21.296c19.431,0,37.701,7.557,51.438,21.296C353.526,105.89,353.526,152.039,325.155,180.404z"></path></g></svg>
+  </a>
+  <div id="product-card-top" >    
+    <a id="product-card-link" href="{{ product.url }}" > 
+      <img loading="lazy" alt="{{ product.featured_image.alt }}" src="{{ product.featured_image | img_url: "large" }}">
+      <div id="product-card-vendor">{{ product.vendor }}</div>
+      <div id="product-card-title">{{ product.title }}</div> 
+    </a>
+  </div>
+  <div id="product-card-bottom">
+    <div class="junip-product-summary-stars-wrapper"> {% render 'junip-product-summary', product: product %}</div>
+
+    {%- if locksmith_access_granted -%}
+    
+      <div id="product-card-price">{{ product.price | money }}</div>
+
+      <form id="product-card-add-to-cart-form" method="post" action="/cart/add" data-productid="{{ product.id }}">
+  
+  
+        <input type="hidden" name="id" data-productid="{{ product.id }}" value="{{ product.variants.first.id }}" />
+        <input type="hidden" min="1" type="number" id="quantity" name="quantity" value="1"/>
+        <input id="product-card-submit" type="submit" value="ADD TO BAG" class="btn" />
+      </form>
+    {%- else -%}
+      <form id="product-card-add-to-cart-form" action="{{  product.url }}">
+           <input id="product-card-submit" type="submit" value="Click for pricing" class="btn" />
+      </form>
+    {%- endif -%}  
+    <div>
+      {% if product.tags contains "gift-with-purchase" %}
+        Gift with Purchase
+      {% else %}
+        <br id="gift-break">
+      {% endif %}
+    </div>
+
+      
+   
+    
+  </div>
+</div>

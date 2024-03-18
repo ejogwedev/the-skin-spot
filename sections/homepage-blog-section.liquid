@@ -1,0 +1,31 @@
+<div id="homepage-edit-blog-container">
+  <span id="homepage-edit-blog-heading">THE EDIT</span>
+  <span id="homepage-edit-blog-subheading">The Skin Spot Blog</span>
+  <div id="homepage-edit-article-cards">
+    {% for article in blogs.the-edit.articles limit:3 %}
+      <div class="article-card">
+        <a href="{{ article.url }}"><img loading="lazy" src="{{ article.image | img_url: "large" }}" alt="{{ article.image.alt }}"></a>
+        <span id="article-card-title">
+          <a class="article-title-link" href="{{ article.url }}">{{ article.title }}</a>
+        </span>
+        <span id="article-card-excerpt">
+          {{ article.excerpt_or_content | strip_html |truncatewords: 15 }}
+        </span>
+        <a id="article-card-cta" href="{{ article.url }}">READ MORE</a>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Homepage Edit Blog",
+  "tag": "section",
+  "class": "section",
+  "presets": [
+    {
+      "name": "Homepage Edit Blog"
+    }
+  ]
+}
+{% endschema %}

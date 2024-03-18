@@ -1,0 +1,37 @@
+{% assign collection = section.settings.collection %}
+
+<span id="featured-header">{{ section.settings.title | escape }}</span>
+<div id="featured-container">
+
+  <div id="featured-products-container">
+    {% for product in collection.products limit:4 %}
+      {% include 'new-product-card', product: product %}
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Homepage Featured",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Featured collection",
+      "label": "t:sections.featured-collection.settings.title.label"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:sections.featured-collection.settings.collection.label"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Homepage Featured"
+    }
+  ]
+}
+{% endschema %}

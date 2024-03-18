@@ -1,0 +1,252 @@
+{% comment %} {%- assign page_url = content_for_header | split:'"pageurl":"' | last | split:'"' | first | split: request.host | last | replace:'\/','/' | replace:'%20',' ' | replace:'\u0026','&'  -%} {% endcomment %}
+
+{%- for i in (1..1) -%}
+
+  {%- unless page_url contains "?" -%}{% break %}{%- endunless -%}
+  {%- assign query_string = page_url | split:'?' | last -%}
+  {%- assign qry_parts= query_string | split:'&' -%}
+
+  {%- for part in qry_parts -%}
+    {%- assign key_and_value = part | split:'=' -%}
+    {%- if key_and_value.size > 1 -%}
+      {% if key_and_value[0] == 'cat' %}
+        {% assign cat = key_and_value[1] %}
+      {% endif %}
+      {% if key_and_value[0] == "month" %}
+        {% assign month = key_and_value[1] %}
+      {% endif %}
+      {% if key_and_value[0] == "year" %}
+        {% assign year = key_and_value[1] %}
+      {%- endif -%} 
+    {%- endif -%}
+  {%- endfor -%}
+{%- endfor -%}
+
+{% assign category = "" %}
+{% assign heading = "" %}
+{% assign blurb = "" %}
+{% assign tag = ""%}
+{% assign read-link = "" %}
+
+
+{% case cat %}
+  {% when 'asktheexperts' %}
+    {% assign tag = cat %}
+    {% assign category = "Ask The Experts" %}
+    {% assign heading  = "Ask The Experts Heading" %}
+    {% assign blurb = "Ask The Experts Blurb" %}
+    {% assign read-link = "saian-skin-care-products-reviewed-2022" %}
+  {% when 'beauty' %}
+    {% assign tag = cat %}
+    {% assign category = "Beauty" %}
+    {% assign heading  = "Beauty Heading" %}
+    {% assign blurb = "Beauty Blurb" %}
+    {% assign read-link = "saian-skin-care-products-reviewed-2022" %}
+  {% when 'haircare' %}
+    {% assign tag = cat %}
+    {% assign category = "Hair Care" %}
+    {% assign heading  = "Hair Care Heading" %}
+    {% assign blurb = "Hair Care Blurb" %}
+    {% assign read-link = "saian-skin-care-products-reviewed-2022" %}
+  {% when 'hotproducts' %}
+    {% assign tag = cat %}
+    {% assign category = "Hot Products" %}
+    {% assign heading  = "Hot Products Heading" %}
+    {% assign blurb = "Hot Products Blurb" %}
+    {% assign read-link = "saian-skin-care-products-reviewed-2022" %}
+  {% when 'newsandevents' %}
+    {% assign tag = cat %}
+    {% assign category = "News and Events" %}
+    {% assign heading  = "News and Events Heading" %}
+    {% assign blurb = "News and Events Blurb" %}
+    {% assign read-link = "saian-skin-care-products-reviewed-2022" %}
+  {% when 'skincare' %}
+    {% assign tag = cat %}
+    {% assign category = "Skin Care" %}
+    {% assign heading  = "How to choose the best face serum for you" %}
+    {% assign blurb = "Wondering what face serum to add to your skin routine? Check out the latest derm-approved serums for early aging, advanced aging, dry skin and more." %}
+    {% assign read-link = "saian-skin-care-products-reviewed-2022" %}
+  {% when 'suncare' %}
+    {% assign tag = cat %}
+    {% assign category = "Sun Care" %}
+    {% assign heading  = "Sun Care Heading" %}
+    {% assign blurb = "Sun Care Blurb" %}
+    {% assign read-link = "saian-skin-care-products-reviewed-2022" %}
+  {% else %}
+    {% assign tag = "skincare" %}
+    {% assign category = "Skin Care" %}
+    {% assign heading  = "How to choose the best face serum for you" %}
+    {% assign blurb = "Wondering what face serum to add to your skin routine" %}
+    {% assign read-link = "saian-skin-care-products-reviewed-2022" %}
+{% endcase %}
+
+<div class="blog-template-container">
+  
+  <div class="blog-banner-container" role="img" aria-label="Three young women with vibrant skin and nude colored tops" style="display:none">
+    <div class="blog-banner-text-container">
+      <div class="banner-text-category">{{ category }}</div>
+      <div class="banner-text-heading">{{ heading }}</div>
+      <div class="banner-text-blurb">{{ blurb }}</div>
+      <div class="banner-text-read"><a href="/blogs/the-edit/{{ read-link }}">Read More</a></div>
+    </div>
+  </div>
+  
+  <div class="featured-articles-container" id="featured-articles">
+    {% for i in (0..2) %}
+      {% assign blog_articles = blog.articles | sort: "published_at" | reverse %}
+      {% assign article = blog_articles[i] %}
+      
+      <div class="featured-article fa1">
+          <a href="{{ article.url }}"><img height="240px" width="100%" loading="lazy" alt="{{article.image.alt}}" src="{{ article.image | img_url: "original" }}"></a>
+          <span class="fa-tag">{{ article.tags[0] }}</span> | <span>{{ article.published_at | date: "%b %d, %Y"}}</span>
+          <div>{{ article.title }}</div>
+          <div><a href="{{ article.url }}">Read More</a></div>
+        </div>
+    {% endfor %}
+        
+  </div>
+  
+  {%- assign  articles_per_page = section.settings.articles_per_page -%}
+
+  <div class="latest-posts-container">
+    <h2 class="latest-posts-heading">Latest Posts</h2>
+
+
+      {% comment %} Collect relevant data from articles on JSON. |JT|{% endcomment %}
+       {%- capture articles_json -%}
+        {%- for article in blog.articles -%}
+          {% assign article_month = article.published_at | date: "%B" %}
+          {% assign article_year = article.published_at | date:"%Y" %}
+          {% if article_month == month and article_year == year %}       
+            {
+              "articleURL": "{{- article.url -}}",
+              "articleImageAlt": "{{- article.image.alt -}}",
+              "firstArticleTag": "{{- article.tags[0] -}}",
+              "articleImage": "{{- article.image | img_url: 'original' -}}",
+              "PublishedAt": "{{- article.published_at | date: "%b %d, %Y" -}}",
+              "title": "{{- article.title -}}",
+              "excerptOrContent": "{{- article.excerpt_or_content | strip_html | truncate: 120 -}}"
+            },
+            {%- endif -%}
+        {%- endfor -%}   
+      {%- endcapture -%}
+      {%- assign articles_json = articles_json | remove_last: ',' | strip_newlines -%}
+
+    {% if tag %}
+
+      {% comment %} Create array of handles from relevant articles. |JT| {% endcomment %}
+      {%- capture articles_containing_tag -%}
+        {%- for article in blog.articles -%}
+          {%- if article.tags contains tag -%}
+            {{ article.handle }},
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+      {%- assign articles_containing_tag = articles_containing_tag | remove_last: ',' | split: ',' -%}
+
+      {% comment %} Collect relevant data from articles on JSON. |JT|{% endcomment %}
+       {%- capture articles_json -%}
+        {%- for article_handle in articles_containing_tag -%}
+          {%- assign article = articles[article_handle] -%}        
+            {
+              "articleURL": "{{- article.url -}}",
+              "articleImageAlt": "{{- article.image.alt -}}",
+              "articleImage": "{{- article.image | img_url: 'original' -}}",
+              "category": "{{- category -}}",
+              "tags": {{- article.tags | json -}},
+              "PublishedAt": "{{- article.published_at | date: "%b %d, %Y" -}}",
+              "title": "{{- article.title -}}",
+              "excerptOrContent": "{{- article.excerpt_or_content | strip_html | truncate: 120 -}}"
+            },
+        {%- endfor -%}   
+      {%- endcapture -%}
+      {%- assign articles_json = articles_json | remove_last: ',' | strip_newlines -%}
+    {% endif %}
+    
+    {% comment %} Set JSON available for JS. |JT| {% endcomment %}
+    <script type="application/json" id="liquid-variables">
+    {
+      "articles": [{{- articles_json -}}],
+      "settings": {
+        "articlesPerPage": {{- articles_per_page -}}
+      }
+    }
+    </script>
+    <script src="{{ 'load-more.js' | asset_url }}" defer></script>
+  </div>
+
+  <div class="blog-sidebar">
+    <div class="blog-connect">
+      <div class="sidebar-h1 connect-heading">Connect with Us!</div>
+      <div class="social-icon-container">
+        <a target="_blank" href="https://www.facebook.com/theskinspotbeverlyhills/"><img alt="The Skin Spot Facebook" src="{{ 'fb-icon-min.png' | asset_url }}"></a>
+      </div>
+      <div class="social-icon-container">
+        <a target="_blank" href="https://www.instagram.com/theskinspot/"><img alt="The Skin Spot Instagram" src="{{ 'ig-icon-min.png' | asset_url }}"></a>
+      </div>
+      <div class="social-icon-container">
+        <a target="_blank" href="https://www.youtube.com/TheSkinSpot"><img alt="The Skin Spot Youtube" src="{{ 'yt-icon-min.png' | asset_url }}"></a>
+      </div>
+      <div class="social-icon-container">
+        <a target="_blank" href="https://www.pinterest.com/the_skin_spot/"><img alt="The Skin Spot Pintrest" src="{{ 'pin-icon-min.png' | asset_url }}"></a>
+      </div>
+    </div>
+    <div class="blog-video">
+      <div class="sidebar-h1">You'll love this video!</div>
+      <iframe src="https://www.youtube.com/embed/A8sCUUQE1lA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <div class="blog-video-title">Welcome to the Skin Spot!</div>
+    </div>
+    <div class="blog-tags">
+      <div class="sidebar-h2 top-tags-header">Top Tags</div>
+      <div>SKINCEUTICALS DERMABLEND VICHY DARK SPOTS AFA ELTAMD FIXMYSKIN JAN MARINI OBAGI SKINMEDICA</div>
+    </div>
+    <div class="blog-archive">
+      <div class="sidebar-h2">Blog Archive</div>
+      <div class="archive-main">
+      <input type="checkbox" id="drop-1" hidden>
+      <label class="dropHeader dropHeader-1 clearfix" for="drop-1"><span>Select Month</span><img src="{{ 'down-min.png' | asset_url }}"></label>
+<!--         <div class="archive-dropdown-container"> -->
+          <div class="list list-1">
+            {% assign all_months = "" %}
+            {% for article in blog.articles %}
+              {% assign article_month =  article.published_at | date: "%B %Y,"%}
+              {% assign all_months = all_months | append: article_month%}
+            {% endfor %}
+            {% assign month_list = all_months | split: "," | uniq %}
+            {% for month in month_list %}
+              {% assign month_year = month | split:" " %}
+              <a href="/blogs/the-edit?month={{ month_year[0] }}&year={{ month_year[1] }}"><div class="item">{{ month }}</div></a>
+            {% endfor %}
+          </div>
+<!--         </div> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "Edit Blog Homepage",
+    "presets": [
+      {
+        "name": "Edit Blog Homepage"
+      }
+    ],
+     "settings": [
+      {
+      "type": "header",
+      "content": "Infinite Scroll"
+      },
+      {
+        "type": "range",
+        "id": "articles_per_page",
+        "min": 1,
+        "max": 20,
+        "step": 1,
+        "unit": "pcs",
+        "label": "Articles per page loaded",
+        "default": 2
+      }
+     ]
+  }
+{% endschema %}

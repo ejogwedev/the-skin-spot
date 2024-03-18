@@ -1,0 +1,82 @@
+/* Legal Notices Page Css */
+.page_legal-notices {
+    max-width: 1280px;
+}
+.page_legal-notices h1{ text-align: center;}
+.legal-notice-wrapper .col-sm-6,
+.legal-notice-wrapper .col-sm-10 {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.legal-notice-wrapper h3 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #be6f62;
+  margin-bottom: 20px;
+  line-height: 1.2;
+  letter-spacing: 0.05em;
+}
+
+.legal-notice-wrapper p {
+  font-family: "Montserrat", sans-serif;
+  color: #414141;
+}
+
+.legal-notice-wrapper {
+  text-align: center;
+}
+.legal-notice-content {
+  text-align: left;
+}
+
+/* Return Policy Page Css*/
+#shopify-section-template--14779906392100__main
+  .page-width.page-width--narrow.section-template--14779906392100__main-padding {
+  padding-top: 0px;
+}
+.return-policy-page,
+.shipping-policy-page {
+  text-align: center;
+}
+.return-policy-page p,
+.return-policy-page li,
+.shipping-policy-page p,
+.shipping-policy-page li {
+  font-size: 18px;
+  line-height: 26px;
+  color: #414141;
+}
+.page_return-policy h1,.page_shipping-policy h1,.main-page-title {
+  text-align: center;
+  font-size: 36px;
+  background-color: #fff9f5;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+.page_return-policy,.page_shipping-policy{
+    padding-top: 0px !important;
+}
+.return-policy-page li {
+  list-style: none !important;
+}
+
+.page-width.page-width--narrow.page_sheilas-closet {
+    max-width: inherit;
+}
+
+/* FAQ Css */
+.page-width--narrow.page_faq{ max-width: inherit;}
+.page_faq .main-page{ padding: 20px 0px;}
+
+.accordion-body.card-body p { padding: 0px 20px;}
+
+
+/* Sheila's Closet */
+.page_sheilas-closet h1 { text-align: end !important; margin-bottom: 0px;}
+.page_sheilas-closet h1.main-page-title.page-title,.page_faq h1.main-page-title.page-title { display: none;}
+
+.content-sheilas-closet-new .row.justify-content-center { justify-content: center;}
+.content-sheilas-closet-new h2{ display: contents;}
